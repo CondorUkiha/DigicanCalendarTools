@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // 制御されます。アセンブリに関連付けられている情報を変更するには、
 // これらの属性値を変更します。
 [assembly: AssemblyTitle("DigicanCalendarTools")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyDescription("デジキャンの出席予定からカレンダーにインポートできるファイルを作成します。")]
+[assembly: AssemblyConfiguration("OpenBetaTest")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("DigicanCalendarTools")]
-[assembly: AssemblyCopyright("Copyright ©  2023")]
+[assembly: AssemblyCopyright("Copyright © CondorUkiha 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
