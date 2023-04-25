@@ -478,11 +478,11 @@ namespace DigicanCalendarTools
         public void WriteCSV(List<List<string>> eventlist, string filepath)
         {
             StreamWriter file = new StreamWriter(filepath, false, Encoding.UTF8);
-            file.WriteLine("Subject,Start Date,Start Time,End Date,End Time,All Day Event,Private,Description");
+            file.WriteLine("Subject,Start Date,Start Time,End Date,End Time,All Day Event,Private,Description,Location");
             for (int i = 0; i < eventlist.Count; i++)
             {
                 var eventdata = eventlist[i];
-                file.WriteLine(string.Format("{0},{1},{2},{3},{4},{5},{6},{7}", eventdata[0], eventdata[1], eventdata[2], eventdata[3], eventdata[4], eventdata[5], eventdata[6], eventdata[7]));
+                file.WriteLine(string.Format("{0},{1},{2},{3},{4},{5},{6},{7},", eventdata[0], eventdata[1], eventdata[2], eventdata[3], eventdata[4], eventdata[5], eventdata[6], eventdata[7]));
             }
             file.Close();
             return;
