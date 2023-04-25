@@ -6,14 +6,7 @@ using System.IO;
 using System.Text;
 using System.Linq;
 using System.Windows.Forms;
-using System.Diagnostics.Tracing;
-using System.Security.Cryptography;
 using Microsoft.VisualBasic.FileIO;
-using DocumentFormat.OpenXml.Office2013.Drawing.ChartStyle;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
-using DocumentFormat.OpenXml.Drawing;
-using DocumentFormat.OpenXml.Wordprocessing;
-using System.Xml.Linq;
 
 namespace DigicanCalendarTools
 {
@@ -21,6 +14,8 @@ namespace DigicanCalendarTools
     {
         private bool is_csv = false;
         private bool is_xlsx = false;
+        private bool save_is_csv = false;
+        private bool save_is_ics = false;
         public Form1()
         {
             InitializeComponent();
@@ -28,7 +23,7 @@ namespace DigicanCalendarTools
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            DataGetSelect.SelectedIndex = 0;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -98,10 +93,37 @@ namespace DigicanCalendarTools
             {
                 throw new ArgumentException("file not find");
             }
+            var dateChecker = new DateChecker();
+            if (DataGetSelect.SelectedIndex == 1)
+            {
+                eventlist = dateChecker.PastDateChecker(eventlist, true);
+            }
+            else if (DataGetSelect.SelectedIndex == 2)
+            {
+                eventlist = dateChecker.PastDateChecker(eventlist, false);
+            }
+            var save = new WriteData();
+            save.WriteCSV(eventlist, SaveFile.Text);
+            MessageBox.Show("処理が完了しました。", "info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void SelectData_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label1_Click_2(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
             // 保存するファイルを選択
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.InitialDirectory = Environment.SpecialFolder.MyDocuments.ToString();
-            sfd.Filter = "iCalendar(カレンダーデータ)|*.ics|ＣＳＶファイル|*.csv";
+            // sfd.Filter = "iCalendar(カレンダーデータ)|*.ics|ＣＳＶファイル|*.csv";
+            sfd.Filter = "ＣＳＶファイル|*.csv";
             sfd.Title = "ファイルを保存";
             sfd.FilterIndex = 1;
             sfd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
@@ -113,10 +135,24 @@ namespace DigicanCalendarTools
 
             if (sfd.ShowDialog() == DialogResult.OK)
             {
-                var save = new WriteData();
-                save.WriteCSV(eventlist, sfd.FileName);
+                var filePath = System.IO.Path.GetFullPath(sfd.FileName);
+                string ext = System.IO.Path.GetExtension(filePath);
+                if (ext == ".ics")
+                {
+                    SaveFile.Text = filePath;
+                    save_is_ics = true;
+
+                }
+                else if (ext == ".csv")
+                {
+                    SaveFile.Text = filePath;
+                    save_is_csv = true;
+                }
+                else
+                {
+                    throw new ArgumentException(string.Format("\"{0}\"'s filetype is not ics or csv."));
+                }
             }
-            MessageBox.Show("処理が完了しました。", "info", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 
@@ -190,6 +226,7 @@ namespace DigicanCalendarTools
                     {
                         break;
                     }
+                    int i = 1;
                     while (true)
                     {
                         // 初期化
@@ -222,9 +259,11 @@ namespace DigicanCalendarTools
                         stratTime = lessontime[0];
                         finishDay = set_year + "/" + date;
                         finishTime = lessontime[1];
-                        var eventdata = new List<string>() { subject, startDay, stratTime, finishDay, finishTime, "False", "True" };
+                        string eventSubject = string.Format("{0}_第{1}回", subject, i.ToString());
+                        var eventdata = new List<string>() { eventSubject, startDay, stratTime, finishDay, finishTime, "False", "False", "" };
                         eventlist.Add(eventdata);
                         h = h + 3;
+                        i++;
                     }
                     v = v + 3;
                 }
@@ -355,6 +394,7 @@ namespace DigicanCalendarTools
                     {
                         break;
                     }
+                    int i = 1;
                     while (true)
                     {
                         // 初期化
@@ -387,9 +427,11 @@ namespace DigicanCalendarTools
                         stratTime = lessontime[0];
                         finishDay = set_year + "/" + date;
                         finishTime = lessontime[1];
-                        var eventdata = new List<string>() { subject, startDay, stratTime, finishDay, finishTime, "False", "True" };
+                        string eventSubject = string.Format("{0}_第{1}回", subject, i.ToString());
+                        var eventdata = new List<string>() { eventSubject, startDay, stratTime, finishDay, finishTime, "False", "False", "" };
                         eventlist.Add(eventdata);
                         h = h + 3;
+                        i++;
                     }
                     v = v + 3;
                 }
@@ -398,17 +440,49 @@ namespace DigicanCalendarTools
         }
     }
 
+    public class DateChecker
+    {
+        public DateChecker() { }
+
+        public List<List<string>> PastDateChecker(List<List<string>> eventlist, bool nowGet)
+        {
+            for (int i = 0; i < eventlist.Count(); i++)
+            {
+                List<string> eventdata = eventlist[i];
+                DateTime now = DateTime.Now;
+                DateTime stratTime = DateTime.ParseExact(string.Format("{0} {1}", eventdata[1], eventdata[2]), "yyyy/MM/d H:m", null);
+                DateTime endTime = DateTime.ParseExact(string.Format("{0} {1}", eventdata[1], eventdata[2]), "yyyy/MM/d H:m", null);
+                if (nowGet)
+                {
+                    if (endTime < now)
+                    {
+                        eventlist.RemoveAt(i);
+                        i--;
+                    }
+                }
+                else
+                {
+                    if (stratTime < now)
+                    {
+                        eventlist.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
+            return eventlist;
+        }
+    }
     public class WriteData
     {
         public WriteData() { }
         public void WriteCSV(List<List<string>> eventlist, string filepath)
         {
             StreamWriter file = new StreamWriter(filepath, false, Encoding.UTF8);
-            file.WriteLine("Subject,Start Date,Start Time,End Date,End Time,All Day Event,Private");
+            file.WriteLine("Subject,Start Date,Start Time,End Date,End Time,All Day Event,Private,Description,Location");
             for (int i = 0; i < eventlist.Count; i++)
             {
                 var eventdata = eventlist[i];
-                file.WriteLine(string.Format("{0},{1},{2},{3},{4},{5},{6}", eventdata[0], eventdata[1], eventdata[2], eventdata[3], eventdata[4], eventdata[5], eventdata[6]));
+                file.WriteLine(string.Format("{0},{1},{2},{3},{4},{5},{6},{7},", eventdata[0], eventdata[1], eventdata[2], eventdata[3], eventdata[4], eventdata[5], eventdata[6], eventdata[7]));
             }
             file.Close();
             return;
