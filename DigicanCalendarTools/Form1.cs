@@ -260,7 +260,7 @@ namespace DigicanCalendarTools
                         finishDay = set_year + "/" + date;
                         finishTime = lessontime[1];
                         string eventSubject = string.Format("{0}_第{1}回", subject, i.ToString());
-                        var eventdata = new List<string>() { eventSubject, startDay, stratTime, finishDay, finishTime, "False", "True", "" };
+                        var eventdata = new List<string>() { eventSubject, startDay, stratTime, finishDay, finishTime, "False", "False", "" };
                         eventlist.Add(eventdata);
                         h = h + 3;
                         i++;
@@ -428,7 +428,7 @@ namespace DigicanCalendarTools
                         finishDay = set_year + "/" + date;
                         finishTime = lessontime[1];
                         string eventSubject = string.Format("{0}_第{1}回", subject, i.ToString());
-                        var eventdata = new List<string>() { eventSubject, startDay, stratTime, finishDay, finishTime, "False", "True", "" };
+                        var eventdata = new List<string>() { eventSubject, startDay, stratTime, finishDay, finishTime, "False", "False", "" };
                         eventlist.Add(eventdata);
                         h = h + 3;
                         i++;
@@ -478,7 +478,7 @@ namespace DigicanCalendarTools
         public void WriteCSV(List<List<string>> eventlist, string filepath)
         {
             StreamWriter file = new StreamWriter(filepath, false, Encoding.UTF8);
-            file.WriteLine("Subject,Start Date,Start Time,End Date,End Time,All Day Event,Private");
+            file.WriteLine("Subject,Start Date,Start Time,End Date,End Time,All Day Event,Private,Description");
             for (int i = 0; i < eventlist.Count; i++)
             {
                 var eventdata = eventlist[i];
