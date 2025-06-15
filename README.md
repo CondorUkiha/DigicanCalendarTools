@@ -21,3 +21,8 @@
 1.0.2.0 - 2023/4/25 リリース
 	変更点
 	・書き出したCSVに説明とロケーションの欄を追加
+
+## License
+Copyright 2025 CondorUkiha
+
+このプログラムは、`Apache License, Version 2.0`でライセンスされています。詳しくは ./LICENSE を参照してください。
